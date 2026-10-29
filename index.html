@@ -21,9 +21,10 @@ body{margin:0;background:#101522;color:#fff;font-family:-apple-system,BlinkMacSy
 .panel{background:#1b2435;border:1px solid #29364d;border-radius:16px;padding:18px;margin-bottom:14px}
 h2{font-size:18px;margin:0 0 8px}
 p{color:#9ba9c2;font-size:13px;line-height:1.5}
-.plate{background:#f5f7fb;color:#111827;border:4px solid #c7ccd5;border-radius:12px;padding:17px 8px;text-align:center;font-size:30px;font-weight:900;letter-spacing:2px;margin:18px 0}
+.plate{background:#f5f7fb;color:#111827;border:4px solid #c7ccd5;border-radius:12px;padding:17px 8px;text-align:center;font-size:30px;font-weight:900;letter-spacing:2px;margin:18px 0;position:relative;overflow:hidden}
 .plate small{font-size:12px;letter-spacing:0;color:#50596a;display:block;margin-top:5px}
-button.main{width:100%;border:0;border-radius:12px;background:#3979f6;color:white;padding:15px;font-size:15px;font-weight:800}
+button.main{width:100%;border:0;border-radius:12px;background:#3979f6;color:white;padding:15px;font-size:15px;font-weight:800;transition:transform .15s,opacity .15s}
+button.main:active{transform:scale(.98)}
 button.main:disabled{opacity:.55}
 button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padding:11px;font-size:13px;font-weight:700}
 .hidden{display:none!important}
@@ -39,10 +40,27 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
 .empty{text-align:center;padding:24px 8px;color:#8e9bb5;font-size:14px}
 .note{font-size:11px;color:#74839d;text-align:center;margin-top:18px}
 #message{min-height:20px;text-align:center}
-.plate.spinning{animation:numberGlow .35s ease-in-out infinite alternate;border-color:#5790ff;box-shadow:0 0 22px #3979f655}
-@keyframes numberGlow{from{transform:scale(.98);box-shadow:0 0 8px #3979f633}to{transform:scale(1.02);box-shadow:0 0 24px #3979f699}}
-.plate.winner{animation:winnerReveal .65s ease-out;border-color:#ffd166;box-shadow:0 0 25px #ffd16666}
-@keyframes winnerReveal{0%{transform:scale(.75);opacity:.3}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+.result-wrap{text-align:center;position:relative}
+.spin-label{font-size:12px;color:#94a3bd;letter-spacing:2px;font-weight:800}
+.plate.spinning{animation:spinGlow .32s ease-in-out infinite alternate;border-color:#5790ff;box-shadow:0 0 20px #3979f655}
+@keyframes spinGlow{from{transform:scale(.97);box-shadow:0 0 8px #3979f633}to{transform:scale(1.02);box-shadow:0 0 25px #3979f699}}
+.plate.winner{animation:reveal .7s cubic-bezier(.2,.8,.2,1);transform-origin:center}
+@keyframes reveal{0%{transform:scale(.65) rotate(-3deg);opacity:0}60%{transform:scale(1.1) rotate(1deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.plate.winner.ordinary{border-color:#aeb9c9;box-shadow:0 0 18px #aeb9c955;animation:ordinaryReveal .65s ease-out}
+@keyframes ordinaryReveal{0%{opacity:.3;transform:scale(.88)}100%{opacity:1;transform:scale(1)}}
+.plate.winner.rare{border-color:#398cff;box-shadow:0 0 28px #398cff99;animation:blueReveal .8s ease-out}
+@keyframes blueReveal{0%{opacity:.2;transform:scale(.7);filter:brightness(.7)}55%{transform:scale(1.12);filter:brightness(1.3)}100%{opacity:1;transform:scale(1);filter:brightness(1)}}
+.plate.winner.epic{border-color:#bc68ff;box-shadow:0 0 20px #a855f799,0 0 45px #a855f755;animation:epicReveal 1s ease-out}
+@keyframes epicReveal{0%{opacity:0;transform:scale(.5) rotate(-7deg);filter:brightness(.5)}50%{opacity:1;transform:scale(1.15) rotate(3deg);filter:brightness(1.5)}75%{transform:scale(.96) rotate(-1deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+.plate.winner.legendary{border-color:#ffc84a;box-shadow:0 0 20px #ffbd50,0 0 45px #ff9f1c99,0 0 70px #ffbd5044;animation:goldReveal 1.25s ease-out}
+@keyframes goldReveal{0%{opacity:0;transform:scale(.35) rotate(-12deg);filter:brightness(.3)}35%{opacity:1;transform:scale(1.2) rotate(5deg);filter:brightness(1.8)}55%{transform:scale(.92) rotate(-3deg)}75%{transform:scale(1.08) rotate(1deg)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
+.legendary-banner{color:#ffcf70;font-size:15px;font-weight:900;letter-spacing:1px;animation:bannerGlow 1s ease-in-out infinite alternate}
+@keyframes bannerGlow{from{text-shadow:0 0 5px #ffbd50}to{text-shadow:0 0 18px #ff9f1c,0 0 30px #ffbd50}}
+.epic-banner{color:#d5a0ff;font-size:14px;font-weight:900;animation:bannerGlow 1s ease-in-out infinite alternate}
+.rare-banner{color:#66b4ff;font-size:13px;font-weight:900}
+.win-text{animation:textAppear .5s ease-out}
+@keyframes textAppear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -77,6 +95,7 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
       <button class="main" id="drawBtn" onclick="draw()">🎰 Выбить номер · 1 200 ₽</button>
       <p id="message"></p>
     </div>
+
     <div class="panel">
       <h2>Редкости номеров</h2>
       <div class="item"><span class="rarity ordinary">● Обычный</span><p>Шанс выпадения — 60%.</p></div>
@@ -183,29 +202,43 @@ function draw(){
 
   const result=document.getElementById('result');
   const start=Date.now();
-  const duration=2600;
+  const duration=2800;
 
   function spin(){
     const elapsed=Date.now()-start;
     if(elapsed>=duration){
       state.last=item;
       state.garage.unshift(item);
+
+      let banner='';
+      if(item.key==='legendary')banner='<div class="legendary-banner win-text">✦ ✨ ЛЕГЕНДАРНЫЙ ✨ ✦</div>';
+      else if(item.key==='epic')banner='<div class="epic-banner win-text">✧ ЭПИЧЕСКИЙ НОМЕР ✧</div>';
+      else if(item.key==='rare')banner='<div class="rare-banner win-text">✦ РЕДКИЙ НОМЕР ✦</div>';
+
       result.innerHTML=`
-        <div class="plate winner">${item.number}<small>РЕГИОН ${item.region}</small></div>
-        <div class="rarity ${item.key}">✨ ${item.rarity.toUpperCase()} НОМЕР</div>
-        <p>Стоимость продажи магазину: <b>${money(item.price)} ₽</b></p>`;
-      message.textContent='🎉 Номер добавлен в гараж!';
+        ${banner}
+        <div class="plate winner ${item.key}">${item.number}<small>РЕГИОН ${item.region}</small></div>
+        <div class="rarity ${item.key} win-text">${item.rarity.toUpperCase()} НОМЕР</div>
+        <p class="win-text">Стоимость продажи магазину: <b>${money(item.price)} ₽</b></p>`;
+
+      if(item.key==='legendary')message.textContent='🌟 НЕВЕРОЯТНО! Выпал легендарный номер!';
+      else if(item.key==='epic')message.textContent='💜 Отлично! Выпал эпический номер!';
+      else if(item.key==='rare')message.textContent='💙 Круто! Выпал редкий номер!';
+      else message.textContent='Номер добавлен в гараж!';
+
       button.disabled=false;
       update();
       return;
     }
 
     result.innerHTML=`
+      <div class="spin-label">ПОИСК НОМЕРА</div>
       <div class="plate spinning">${makeNumber()}<small>РЕГИОН ${randomItem(REGIONS)}</small></div>
       <div class="rarity ordinary">ПРОКРУТКА...</div>
       <p style="text-align:center">Ищем твой номер</p>`;
+
     const progress=elapsed/duration;
-    const delay=45+Math.pow(progress,2)*220;
+    const delay=45+Math.pow(progress,3)*280;
     setTimeout(spin,delay);
   }
   spin();
