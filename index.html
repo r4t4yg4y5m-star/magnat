@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Номерной магнат</title>
 <style>
 *{box-sizing:border-box}
@@ -17,7 +16,7 @@ body{margin:0;background:#101522;color:#fff;font-family:-apple-system,BlinkMacSy
 .money{font-size:29px;font-weight:800;margin-top:6px}
 .money span{font-size:17px;color:#8eaaff}
 .tabs{display:flex;gap:7px;margin-bottom:18px}
-.tabs button{flex:1;border:0;border-radius:11px;background:#252d3e;color:#c7d0e2;padding:13px 4px;font-size:13px;font-weight:700}
+.tabs button{flex:1;border:0;border-radius:11px;background:#252d3e;color:#c7d0e2;padding:13px 4px;font-size:13px;font-weight:700;transition:background .2s}
 .tabs button.active{background:#3979f6;color:#fff}
 .panel{background:#1b2435;border:1px solid #29364d;border-radius:16px;padding:18px;margin-bottom:14px}
 h2{font-size:18px;margin:0 0 8px}
@@ -25,7 +24,7 @@ p{color:#9ba9c2;font-size:13px;line-height:1.5}
 .plate{background:#f5f7fb;color:#111827;border:4px solid #c7ccd5;border-radius:12px;padding:17px 8px;text-align:center;font-size:30px;font-weight:900;letter-spacing:2px;margin:18px 0}
 .plate small{font-size:12px;letter-spacing:0;color:#50596a;display:block;margin-top:5px}
 button.main{width:100%;border:0;border-radius:12px;background:#3979f6;color:white;padding:15px;font-size:15px;font-weight:800}
-button.main:disabled{opacity:.5}
+button.main:disabled{opacity:.55}
 button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padding:11px;font-size:13px;font-weight:700}
 .hidden{display:none!important}
 .rarity{font-size:12px;font-weight:800;margin:10px 0}
@@ -39,6 +38,11 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
 .item button{width:100%;margin-top:9px}
 .empty{text-align:center;padding:24px 8px;color:#8e9bb5;font-size:14px}
 .note{font-size:11px;color:#74839d;text-align:center;margin-top:18px}
+#message{min-height:20px;text-align:center}
+.plate.spinning{animation:numberGlow .35s ease-in-out infinite alternate;border-color:#5790ff;box-shadow:0 0 22px #3979f655}
+@keyframes numberGlow{from{transform:scale(.98);box-shadow:0 0 8px #3979f633}to{transform:scale(1.02);box-shadow:0 0 24px #3979f699}}
+.plate.winner{animation:winnerReveal .65s ease-out;border-color:#ffd166;box-shadow:0 0 25px #ffd16666}
+@keyframes winnerReveal{0%{transform:scale(.75);opacity:.3}65%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -66,19 +70,19 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
       <div class="small">СТОИМОСТЬ ПРОКРУТКИ</div>
       <div style="font-size:23px;font-weight:800;margin-top:5px">1 200 ₽</div>
       <div id="result">
-        <div class="plate">А000АА <small>РЕГИОН 77</small></div>
+        <div class="plate">А000АА<small>РЕГИОН 77</small></div>
         <div class="rarity ordinary">Обычный номер</div>
         <p>Нажми кнопку, чтобы выбить первый номер.</p>
       </div>
       <button class="main" id="drawBtn" onclick="draw()">🎰 Выбить номер · 1 200 ₽</button>
-      <p id="message" style="text-align:center;margin-bottom:0"></p>
+      <p id="message"></p>
     </div>
     <div class="panel">
       <h2>Редкости номеров</h2>
-      <div class="item"><span class="rarity ordinary">● Обычный</span><p>Самый распространённый тип номера.</p></div>
-      <div class="item"><span class="rarity rare">● Редкий</span><p>Попадается заметно реже обычного.</p></div>
-      <div class="item"><span class="rarity epic">● Эпический</span><p>Ценная находка для коллекции.</p></div>
-      <div class="item"><span class="rarity legendary">● Легендарный</span><p>Самая редкая категория.</p></div>
+      <div class="item"><span class="rarity ordinary">● Обычный</span><p>Шанс выпадения — 60%.</p></div>
+      <div class="item"><span class="rarity rare">● Редкий</span><p>Шанс выпадения — 25%.</p></div>
+      <div class="item"><span class="rarity epic">● Эпический</span><p>Шанс выпадения — 12%.</p></div>
+      <div class="item"><span class="rarity legendary">● Легендарный</span><p>Шанс выпадения — 3%.</p></div>
     </div>
   </section>
 
@@ -93,9 +97,9 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
   <section id="market" class="hidden">
     <div class="panel">
       <h2>Рынок номеров</h2>
-      <p>Здесь можно посмотреть стоимость номеров разных редкостей.</p>
+      <p>Цены продажи игровому магазину по редкостям.</p>
       <div id="marketList"></div>
-      <p>Покупки между реальными игроками пока не подключены.</p>
+      <p>Покупки между игроками пока не подключены.</p>
     </div>
   </section>
 
@@ -103,73 +107,45 @@ button.secondary{border:0;border-radius:10px;background:#2a354a;color:white;padd
 </div>
 
 <script>
-const REGIONS = [
-  '01','02','102','702','16','116','716','23','93','123','193',
-  '24','84','88','124','25','125','34','134','36','136','38',
-  '85','777','14'
+const REGIONS=['01','02','102','702','16','116','716','23','93','123','193','24','84','88','124','25','125','34','134','36','136','38','85','777','14'];
+const COST=1200;
+const RARITIES=[
+  {name:'Обычный',key:'ordinary',price:500},
+  {name:'Редкий',key:'rare',price:1800},
+  {name:'Эпический',key:'epic',price:6000},
+  {name:'Легендарный',key:'legendary',price:20000}
 ];
-
-const COST = 1200;
-
-const RARITIES = [
-  {name:'Обычный',key:'ordinary',chance:60,price:500},
-  {name:'Редкий',key:'rare',chance:25,price:1800},
-  {name:'Эпический',key:'epic',chance:12,price:6000},
-  {name:'Легендарный',key:'legendary',chance:3,price:20000}
-];
-
-const LETTERS = ['А','В','Е','К','М','Н','О','Р','С','Т','У','Х'];
+const LETTERS=['А','В','Е','К','М','Н','О','Р','С','Т','У','Х'];
 
 function loadState(){
   try{
     const saved=JSON.parse(localStorage.getItem('magnatSave'));
-    if(saved && typeof saved.balance==='number' && Array.isArray(saved.garage)){
-      return saved;
-    }
+    if(saved&&typeof saved.balance==='number'&&Array.isArray(saved.garage))return saved;
   }catch(e){}
   return {balance:25000,garage:[],last:null};
 }
-
 let state=loadState();
 
 function save(){
-  try{
-    localStorage.setItem('magnatSave',JSON.stringify(state));
-  }catch(e){}
+  try{localStorage.setItem('magnatSave',JSON.stringify(state));}catch(e){}
 }
-
-function money(value){
-  return Math.round(value).toLocaleString('ru-RU');
-}
-
+function money(value){return Math.round(value).toLocaleString('ru-RU');}
 function update(){
   document.getElementById('balance').textContent=money(state.balance);
   save();
 }
-
 function show(page){
-  ['home','garage','market'].forEach(function(p){
+  ['home','garage','market'].forEach(p=>{
     document.getElementById(p).classList.toggle('hidden',p!==page);
   });
-
-  document.querySelectorAll('.tabs button').forEach(function(btn){
-    btn.classList.remove('active');
-  });
-
+  document.querySelectorAll('.tabs button').forEach(btn=>btn.classList.remove('active'));
   const index={home:0,garage:1,market:2}[page];
   const buttons=document.querySelectorAll('.tabs button');
-  if(index!==undefined && buttons[index]){
-    buttons[index].classList.add('active');
-  }
-
+  if(index!==undefined&&buttons[index])buttons[index].classList.add('active');
   if(page==='garage')renderGarage();
   if(page==='market')renderMarket();
 }
-
-function randomItem(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
-}
-
+function randomItem(arr){return arr[Math.floor(Math.random()*arr.length)];}
 function rollRarity(){
   const n=Math.random()*100;
   if(n<3)return RARITIES[3];
@@ -177,24 +153,23 @@ function rollRarity(){
   if(n<40)return RARITIES[1];
   return RARITIES[0];
 }
-
 function makeNumber(){
-  const l1=randomItem(LETTERS);
-  const l2=randomItem(LETTERS);
-  const l3=randomItem(LETTERS);
-  const digits=String(Math.floor(Math.random()*1000)).padStart(3,'0');
-  return l1+digits+l2+l3;
+  return randomItem(LETTERS)+String(Math.floor(Math.random()*1000)).padStart(3,'0')+randomItem(LETTERS)+randomItem(LETTERS);
 }
 
 function draw(){
   const message=document.getElementById('message');
-
+  const button=document.getElementById('drawBtn');
+  if(button.disabled)return;
   if(state.balance<COST){
     message.textContent='Недостаточно денег для прокрутки!';
     return;
   }
 
+  button.disabled=true;
+  message.textContent='🎰 Прокручиваем номера...';
   state.balance-=COST;
+  update();
 
   const rarity=rollRarity();
   const item={
@@ -206,68 +181,64 @@ function draw(){
     price:rarity.price
   };
 
-  state.last=item;
-  state.garage.unshift(item);
+  const result=document.getElementById('result');
+  const start=Date.now();
+  const duration=2600;
 
-  document.getElementById('result').innerHTML=`
-    <div class="plate">${item.number}<small>РЕГИОН ${item.region}</small></div>
-    <div class="rarity ${item.key}">${item.rarity.toUpperCase()} НОМЕР</div>
-    <p>Стоимость продажи магазину: <b>${money(item.price)} ₽</b></p>
-  `;
+  function spin(){
+    const elapsed=Date.now()-start;
+    if(elapsed>=duration){
+      state.last=item;
+      state.garage.unshift(item);
+      result.innerHTML=`
+        <div class="plate winner">${item.number}<small>РЕГИОН ${item.region}</small></div>
+        <div class="rarity ${item.key}">✨ ${item.rarity.toUpperCase()} НОМЕР</div>
+        <p>Стоимость продажи магазину: <b>${money(item.price)} ₽</b></p>`;
+      message.textContent='🎉 Номер добавлен в гараж!';
+      button.disabled=false;
+      update();
+      return;
+    }
 
-  message.textContent='Номер добавлен в гараж!';
-  update();
+    result.innerHTML=`
+      <div class="plate spinning">${makeNumber()}<small>РЕГИОН ${randomItem(REGIONS)}</small></div>
+      <div class="rarity ordinary">ПРОКРУТКА...</div>
+      <p style="text-align:center">Ищем твой номер</p>`;
+    const progress=elapsed/duration;
+    const delay=45+Math.pow(progress,2)*220;
+    setTimeout(spin,delay);
+  }
+  spin();
 }
 
 function renderGarage(){
   const list=document.getElementById('garageList');
-
   if(!state.garage.length){
     list.innerHTML='<div class="empty">Гараж пуст. Выбей свой первый номер!</div>';
     return;
   }
-
-  list.innerHTML=state.garage.map(function(item){
-    return `
-      <div class="item">
-        <div class="itemtop">
-          <span class="rarity ${item.key}">${item.rarity}</span>
-          <span class="small">${money(item.price)} ₽</span>
-        </div>
-        <div class="plate">${item.number}<small>РЕГИОН ${item.region}</small></div>
-        <button class="secondary" onclick="sell('${item.id}')">Продать магазину за ${money(item.price)} ₽</button>
-      </div>
-    `;
-  }).join('');
+  list.innerHTML=state.garage.map(item=>`
+    <div class="item">
+      <div class="itemtop"><span class="rarity ${item.key}">${item.rarity}</span><span class="small">${money(item.price)} ₽</span></div>
+      <div class="plate">${item.number}<small>РЕГИОН ${item.region}</small></div>
+      <button class="secondary" onclick="sell('${item.id}')">Продать магазину за ${money(item.price)} ₽</button>
+    </div>`).join('');
 }
-
 function sell(id){
-  const index=state.garage.findIndex(function(item){return item.id===id});
+  const index=state.garage.findIndex(item=>item.id===id);
   if(index===-1)return;
-
-  const item=state.garage[index];
-  state.balance+=item.price;
+  state.balance+=state.garage[index].price;
   state.garage.splice(index,1);
-
   update();
   renderGarage();
 }
-
 function renderMarket(){
-  const list=document.getElementById('marketList');
-  list.innerHTML=RARITIES.slice().reverse().map(function(r){
-    return `
-      <div class="item">
-        <div class="itemtop">
-          <span class="rarity ${r.key}">${r.name}</span>
-          <b>${money(r.price)} ₽</b>
-        </div>
-        <p>Цена продажи такого номера игровому магазину.</p>
-      </div>
-    `;
-  }).join('');
+  document.getElementById('marketList').innerHTML=RARITIES.slice().reverse().map(r=>`
+    <div class="item">
+      <div class="itemtop"><span class="rarity ${r.key}">${r.name}</span><b>${money(r.price)} ₽</b></div>
+      <p>Цена продажи такого номера игровому магазину.</p>
+    </div>`).join('');
 }
-
 update();
 </script>
 </body>
